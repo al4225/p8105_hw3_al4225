@@ -1,0 +1,12 @@
+---
+title: "p8105_hw3_al4225"
+author: "Anjing"
+date: "2022-10-10"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R 
