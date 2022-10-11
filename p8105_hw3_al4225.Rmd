@@ -5,8 +5,106 @@ date: "2022-10-10"
 output: github_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(tidyverse)
 ```
 
-## R 
+## Problem 2
+
+### Wrangling
+Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+
+There are `r accel_data = read_csv("./data/accel_data.csv",
+                col_names = TRUE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  mutate(
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekday", "weekend")) %>%
+  group_by(week,day_id) %>%
+  pivot_longer(
+    activity_1:activity_1440, 
+    names_to = "activity_minute", 
+    values_to = "activity_counts",
+    names_prefix = "activity_") %>%
+  mutate(
+    activity_counts = round(activity_counts, digits = 0),
+    activity_minute = as.integer(activity_minute)) %>%
+    select(week, day_id, day, day_type, everything())
+nrow(accel_data)` observations and `r accel_data = read_csv("./data/accel_data.csv",
+                col_names = TRUE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  mutate(
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekday", "weekend")) %>%
+  group_by(week,day_id) %>%
+  pivot_longer(
+    activity_1:activity_1440, 
+    names_to = "activity_minute", 
+    values_to = "activity_counts",
+    names_prefix = "activity_") %>%
+  mutate(
+    activity_counts = round(activity_counts, digits = 0),
+    activity_minute = as.integer(activity_minute)) %>%
+    select(week, day_id, day, day_type, everything())
+ncol(accel_data)` variables. Each observation represents the activity counts for each minute of a 24-hour day starting at midnight in the day of given week. There are some key variables such as week, day_id, day, day_type and activity_minute and activity_counts. 
+```{r}
+accel_data = read_csv("./data/accel_data.csv",
+                col_names = TRUE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  mutate(
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekday", "weekend")) %>%
+  group_by(week,day_id) %>%
+  pivot_longer(
+    activity_1:activity_1440, 
+    names_to = "activity_minute", 
+    values_to = "activity_counts",
+    names_prefix = "activity_") %>%
+  mutate(
+    activity_counts = round(activity_counts, digits = 0),
+    activity_minute = as.integer(activity_minute)) %>%
+    select(week, day_id, day, day_type, everything())
+nrow(accel_data)
+ncol(accel_data)
+
+accel_data
+```
+
+### Table for total activity
+Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+
+According to the table, we can see that there are 35 total activity counts in 35 days. From week1 to week3, the total activity counts maintain a high level and gradually increase from week1 to week2. From week3 to week5, the total activity counts tend to decrease especially on Saturday. 
+```{r}
+accel_data %>%
+  group_by(week, day_id, day) %>%
+  summarize(activity_total = sum(activity_counts)) %>%
+  knitr::kable()
+accel_data
+```
+
+### Graph
+Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
+
+Description:
+1.There are two evident peaks in the plot which are at 21:00 on Friday and during 9:00 to 12:00 on Sunday.  
+2.The activity counts are higher on Friday and Sunday so this 63 year-old male with BMI 25 prefers to do the activity on Friday and Sunday.
+3.The activity counts decline from 21:00 to 3:00 the next day and they increase from 3:00 to 21:00. It means that the man tends to have a rest after 21:00.  
+```{r}
+accel_data %>%
+  ggplot(aes(x = activity_minute, y = activity_counts, color = day)) + 
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "activity_counts plot",
+    x = "time of the day",
+    y = "activity counts"
+  ) +
+  scale_x_continuous(
+    breaks = c(0, 360, 720, 1080, 1440), 
+    labels = c("0:00", "6:00", "12:00","18:00", "24:00" )
+  ) +
+  theme(legend.position = "bottom")
+  
+```
+
+
+## Problem 3
