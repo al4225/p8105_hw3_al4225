@@ -288,3 +288,41 @@ ny_noaa_data %>%
   arrange(desc(n_obs))
 snow
 ```
+
+### Average max temperature
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+**Steps**
+First, I filter the observations and only keep rows in Jan and Jul.
+Second, I group the data by year and month.
+Third, I calculate the mean of tmax.
+Forth, I make the point and smooth plot with x = year and y = mean_year.
+Fifth, I add some labs and make it a 2-panel plot.
+
+**Discription**:
+According to the plots I made, we can see that:
+1.The average max temperature in January is lower than the average max temperature in July across years.
+2.The average max temperature in January is more fluctuated than in July. In other words, the average max temperature in July is smoother across years.
+3.The average max temperature in January is between -5 and 5 °C.
+4.The average max temperature in July is between 25 and 30 °C.
+```{r}
+mean_tmax = 
+  ny_noaa_data %>%
+  filter(month %in% c("Jan", "Jul")) %>%
+  group_by(year, month) %>%
+  drop_na() %>%
+  mutate(mean_tmax = mean(tmax)) %>%
+  ggplot(aes(x = year, y = mean_tmax, color = month)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = TRUE) +
+  labs(
+    title = "Temperature plot",
+    x = "year",
+    y = "the average max temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) +
+  facet_grid(. ~ month)
+
+mean_tmax
+```
+
