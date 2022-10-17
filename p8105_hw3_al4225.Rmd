@@ -266,3 +266,25 @@ n5_extent = n5/n
 n5_extent
 
 ```
+
+### snowfall
+For snowfall, what are the most commonly observed values? Why?
+
+**Steps**:
+First, I group the data by snow.
+Second, I calculate each values‘s number.
+Third, I show the value and number from the most commonly value to the least commonly value.
+
+**Discription**
+We can see that 0 is the most commonly observed values because there are 1112758(largest) observations with value 0. The second commonly observed value is 25 because there are 15809(second largest) observations with this value. 
+So we can see that most of the days, it doesn't snow at all.
+```{r}
+snow = 
+ny_noaa_data %>%
+  group_by(snow) %>%
+  drop_na() %>%
+  summarize(
+    n_obs = n()) %>%
+  arrange(desc(n_obs))
+snow
+```
