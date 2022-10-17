@@ -33,7 +33,7 @@ Load, tidy, and otherwise wrangle the data. Your final dataset should include al
 **Steps**:
 First, I load and clean the data.
 Second, I create a day_type variable to show whether the day is weekday or weekend.
-Third, I group by the data according to week and day_id.
+Third, I group the data according to week and day_id.
 Forth, I use pivot_longer to tidy the activity counts and minutes.
 Fifth, I round the value of activity counts with 0 digits and change activity_minute to integer values.
 At last, I adjust the order of the columns.
@@ -99,7 +99,7 @@ accel_data
 Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
 
 **Steps**:
-Frist, I group by the dataset according to week, day_id and day. 
+Frist, I group the dataset according to week, day_id and day. 
 Second, I sum the activity_counts and create a total activity variable for each day.
 Third, I create a table to show the totals.
 
@@ -111,4 +111,33 @@ accel_data %>%
   summarize(activity_total = sum(activity_counts)) %>%
   knitr::kable()
 accel_data
+```
+
+### Graph
+Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
+
+**Steps**
+First, I make a smooth plot with x = activity_minute and y = activity_counts.
+Second, I add some labs and adjust the x scale.
+Third, I put the theme to the bottom.
+
+**Description**:
+1.There are two evident peaks in the plot which are at 21:00 on Friday and during 9:00 to 12:00 on Sunday.  
+2.The activity counts are higher on Friday and Sunday so this 63 year-old male with BMI 25 prefers to do the activity on Friday and Sunday.
+3.The activity counts decline from 21:00 to 3:00 the next day and they increase from 3:00 to 21:00. It means that the man tends to have a rest after 21:00.  
+```{r}
+accel_data %>%
+  ggplot(aes(x = activity_minute, y = activity_counts, color = day)) + 
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Activity_counts plot",
+    x = "Time of the day",
+    y = "Activity counts"
+  ) +
+  scale_x_continuous(
+    breaks = c(0, 360, 720, 1080, 1440), 
+    labels = c("0:00", "6:00", "12:00","18:00", "24:00" )
+  ) +
+  theme(legend.position = "bottom")
+  
 ```
