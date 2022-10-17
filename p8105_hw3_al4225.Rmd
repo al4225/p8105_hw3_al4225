@@ -141,3 +141,64 @@ accel_data %>%
   theme(legend.position = "bottom")
   
 ```
+
+## Problem 3
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
+
+The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):
+
+### Data cleaning
+Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. 
+
+**Steps**
+First, I do data cleaning. 
+Second, I separate variables for year, month and day.
+Third, I change the units of tmax and tmin from tenths of degrees C to degrees C and the unit of prcp: precipitation (tenths of mm) to mm.
+
+**Discription**: After data cleaning, It is an 2,595,176 × 9 table, there are `r ny_noaa_data = 
+ny_noaa %>%
+  janitor::clean_names() %>%
+  separate(date, into  = c("year", "month", "day"), sep = "-") %>%
+  mutate(year = as.integer(year), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month],
+         tmax = as.integer(tmax),
+         tmin = as.integer(tmin),
+         tmax = tmax / 10,
+         tmin = tmin / 10,
+         prcp = prcp / 10) 
+         nrow(ny_noaa_data)` observations and `r ny_noaa_data = 
+ny_noaa %>%
+  janitor::clean_names() %>%
+  separate(date, into  = c("year", "month", "day"), sep = "-") %>%
+  mutate(year = as.integer(year), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month],
+         tmax = as.integer(tmax),
+         tmin = as.integer(tmin),
+         tmax = tmax / 10,
+         tmin = tmin / 10,
+         prcp = prcp / 10) 
+         ncol(ny_noaa_data)` variables in the dataset. The key variables are id(Weather station ID), year, month, day, prcp(precipitation(mm)), snow(Snowfall (mm)), snwd(Snow depth (mm)), tmax(Maximum temperature (degrees C)) and tmin(Minimum temperature (degrees C)).
+```{r}
+ny_noaa_data = 
+ny_noaa %>%
+  janitor::clean_names() %>%
+  separate(date, into  = c("year", "month", "day"), sep = "-") %>%
+  mutate(year = as.integer(year), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month],
+         tmax = as.integer(tmax),
+         tmin = as.integer(tmin),
+         tmax = tmax / 10,
+         tmin = tmin / 10,
+         prcp = prcp / 10) 
+ny_noaa_data
+```
