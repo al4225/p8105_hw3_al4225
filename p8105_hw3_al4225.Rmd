@@ -95,3 +95,20 @@ ncol(accel_data)
 accel_data
 ```
 
+### Table for total activity
+Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+
+**Steps**:
+Frist, I group by the dataset according to week, day_id and day. 
+Second, I sum the activity_counts and create a total activity variable for each day.
+Third, I create a table to show the totals.
+
+**Discription**:
+According to the table, we can see that there are 35 total activity counts in 35 days. From week1 to week3, the total activity counts maintain a high level and gradually increase from week1 to week2. From week3 to week5, the total activity counts tend to decrease especially on Saturday. 
+```{r}
+accel_data %>%
+  group_by(week, day_id, day) %>%
+  summarize(activity_total = sum(activity_counts)) %>%
+  knitr::kable()
+accel_data
+```
