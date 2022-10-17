@@ -7,6 +7,22 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ## Problem 2
@@ -14,12 +30,21 @@ library(tidyverse)
 ### Wrangling
 Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
 
+**Steps**:
+First, I load and clean the data.
+Second, I create a day_type variable to show whether the day is weekday or weekend.
+Third, I group by the data according to week and day_id.
+Forth, I use pivot_longer to tidy the activity counts and minutes.
+Fifth, I round the value of activity counts with 0 digits and change activity_minute to integer values.
+At last, I adjust the order of the columns.
+
+**Discription**:
 There are `r accel_data = read_csv("./data/accel_data.csv",
                 col_names = TRUE) %>%
   janitor::clean_names() %>%
   drop_na() %>%
   mutate(
-    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekday", "weekend")) %>%
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekend", "weekday")) %>%
   group_by(week,day_id) %>%
   pivot_longer(
     activity_1:activity_1440, 
@@ -35,7 +60,7 @@ nrow(accel_data)` observations and `r accel_data = read_csv("./data/accel_data.c
   janitor::clean_names() %>%
   drop_na() %>%
   mutate(
-    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekday", "weekend")) %>%
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekend", "weekday")) %>%
   group_by(week,day_id) %>%
   pivot_longer(
     activity_1:activity_1440, 
@@ -53,7 +78,7 @@ accel_data = read_csv("./data/accel_data.csv",
   janitor::clean_names() %>%
   drop_na() %>%
   mutate(
-    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekday", "weekend")) %>%
+    day_type = ifelse(day %in% c("Saturday", "Sunday"), "weekend", "weekday")) %>%
   group_by(week,day_id) %>%
   pivot_longer(
     activity_1:activity_1440, 
@@ -70,41 +95,3 @@ ncol(accel_data)
 accel_data
 ```
 
-### Table for total activity
-Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
-
-According to the table, we can see that there are 35 total activity counts in 35 days. From week1 to week3, the total activity counts maintain a high level and gradually increase from week1 to week2. From week3 to week5, the total activity counts tend to decrease especially on Saturday. 
-```{r}
-accel_data %>%
-  group_by(week, day_id, day) %>%
-  summarize(activity_total = sum(activity_counts)) %>%
-  knitr::kable()
-accel_data
-```
-
-### Graph
-Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
-
-Description:
-1.There are two evident peaks in the plot which are at 21:00 on Friday and during 9:00 to 12:00 on Sunday.  
-2.The activity counts are higher on Friday and Sunday so this 63 year-old male with BMI 25 prefers to do the activity on Friday and Sunday.
-3.The activity counts decline from 21:00 to 3:00 the next day and they increase from 3:00 to 21:00. It means that the man tends to have a rest after 21:00.  
-```{r}
-accel_data %>%
-  ggplot(aes(x = activity_minute, y = activity_counts, color = day)) + 
-  geom_smooth(se = FALSE) +
-  labs(
-    title = "activity_counts plot",
-    x = "time of the day",
-    y = "activity counts"
-  ) +
-  scale_x_continuous(
-    breaks = c(0, 360, 720, 1080, 1440), 
-    labels = c("0:00", "6:00", "12:00","18:00", "24:00" )
-  ) +
-  theme(legend.position = "bottom")
-  
-```
-
-
-## Problem 3
