@@ -125,7 +125,7 @@ Third, I put the theme to the bottom.
 1.There are two evident peaks in the plot which are at 21:00 on Friday and during 9:00 to 12:00 on Sunday.  
 2.The activity counts are higher on Friday and Sunday so this 63 year-old male with BMI 25 prefers to do the activity on Friday and Sunday.
 3.The activity counts decline from 21:00 to 3:00 the next day and they increase from 3:00 to 21:00. It means that the man tends to have a rest after 21:00.  
-```{r}
+```{r activity_counts plot}
 accel_data %>%
   ggplot(aes(x = activity_minute, y = activity_counts, color = day)) + 
   geom_smooth(se = FALSE) +
@@ -139,6 +139,7 @@ accel_data %>%
     labels = c("0:00", "6:00", "12:00","18:00", "24:00" )
   ) +
   theme(legend.position = "bottom")
+ggsave("activity_counts_plot.pdf")
   
 ```
 
@@ -278,7 +279,7 @@ Third, I show the value and number from the most commonly value to the least com
 **Discription**
 We can see that 0 is the most commonly observed values because there are 1112758(largest) observations with value 0. The second commonly observed value is 25 because there are 15809(second largest) observations with this value. 
 So we can see that most of the days, it doesn't snow at all.
-```{r}
+```{r snowfall}
 snow = 
 ny_noaa_data %>%
   group_by(snow) %>%
@@ -305,7 +306,7 @@ According to the plots I made, we can see that:
 2.The average max temperature in January is more fluctuated than in July. In other words, the average max temperature in July is smoother across years.
 3.The average max temperature in January is between -5 and 5 °C.
 4.The average max temperature in July is between 25 and 30 °C.
-```{r}
+```{r mean_tmax}
 mean_tmax = 
   ny_noaa_data %>%
   filter(month %in% c("Jan", "Jul")) %>%
@@ -322,7 +323,7 @@ mean_tmax =
     caption = "Data from the rnoaa package"
   ) +
   facet_grid(. ~ month)
-
+ggsave("mean_tmax_plot.pdf")
 mean_tmax
 ```
 
@@ -337,7 +338,7 @@ Third, I add some labs and make it a 2-panel plot.
 Each whisker (fence) is at most 1.5(IQR) long or at the maximum (minimum), whichever is shorter. 
 The outliers are those further away than 1.5(IQR) and are marked separately as outliers the box. In other words, any point further away than the line in the middle is an outlier. 
 According to the boxplot, the points are not further away from the "whisker" so we can think that there are  no outliers.
-```{r}
+```{r Outliers}
 mean_tmax = 
   ny_noaa_data %>%
   filter(month %in% c("Jan", "Jul")) %>%
@@ -354,7 +355,7 @@ mean_tmax =
     caption = "Data from the rnoaa package"
   ) +
   facet_grid(. ~ month)
-
+ggsave("mean_tmax_outlier.pdf")
 mean_tmax
 ```
 
@@ -366,7 +367,7 @@ Make a two-panel plot showing
 
 **Steps**:
 First, I make a tmax vs tmin for the full dataset
-Second, I make a a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+Second, I make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 Third, I make it a 2-panel plot.
 
 **Discription**: According to the plot, we can see that:
@@ -383,7 +384,7 @@ Third, I make it a 2-panel plot.
 2. From 1981 to 2010, there are 2 peaks of snowfall. The first one is in(0,20), the second one is in(20,40).
 3. Except for (0,40), the snowfall also distributed around 50 mm but few of them greater than 80 mm.
 4. The value and the distribution of snowfall in each year were similar and not fluctuated obviously.
-```{r}
+```{r tmax vs tmin and distribution of snowfall values}
 library(ggridges)
 library(ggplot2)
 library(patchwork)
@@ -419,5 +420,72 @@ ny_noaa_data %>%
   theme(legend.position = "none")
 
 tmax_tmin + snowfall
+ggsave("tmax_tmin_snowfall.pdf")
 ```
+
+
+### Problem 1
+
+#### Read in the data
+
+```{r}
+library(p8105.datasets)
+data("instacart")
+
+instacart = 
+  instacart %>% 
+  as_tibble(instacart)
+```
+
+#### Answer questions about the data
+
+This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns, with each row resprenting a single product from an instacart order. Variables include identifiers for user, order, and product; the order in which each product was added to the cart. There are several order-level variables, describing the day and time of the order, and number of days since prior order. Then there are several item-specific variables, describing the product name (e.g. Yogurt, Avocado), department (e.g. dairy and eggs, produce), and aisle (e.g. yogurt, fresh fruits), and whether the item has been ordered by this user in the past. In total, there are `r instacart %>% select(product_id) %>% distinct %>% count` products found in `r instacart %>% select(user_id, order_id) %>% distinct %>% count` orders from `r instacart %>% select(user_id) %>% distinct %>% count` distinct users.
+
+Below is a table summarizing the number of items ordered from aisle. In total, there are 134 aisles, with fresh vegetables and fresh fruits holding the most items ordered by far.
+
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  arrange(desc(n))
+```
+
+Next is a plot that shows the number of items ordered in each aisle. Here, aisles are ordered by ascending number of items.
+
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  filter(n > 10000) %>% 
+  mutate(aisle = fct_reorder(aisle, n)) %>% 
+  ggplot(aes(x = aisle, y = n)) + 
+  geom_point() + 
+  labs(title = "Number of items ordered in each aisle") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+```
+
+Our next table shows the three most popular items in aisles `baking ingredients`, `dog food care`, and `packaged vegetables fruits`, and includes the number of times each item is ordered in your table.
+
+```{r}
+instacart %>% 
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>%
+  group_by(aisle) %>% 
+  count(product_name) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank < 4) %>% 
+  arrange(desc(n)) %>%
+  knitr::kable()
+```
+
+Finally is a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week. This table has been formatted in an untidy manner for human readers. Pink Lady Apples are generally purchased slightly earlier in the day than Coffee Ice Cream, with the exception of day 5.
+
+```{r}
+instacart %>%
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  group_by(product_name, order_dow) %>%
+  summarize(mean_hour = mean(order_hour_of_day)) %>%
+  spread(key = order_dow, value = mean_hour) %>%
+  knitr::kable(digits = 2)
+```
+
+
 
